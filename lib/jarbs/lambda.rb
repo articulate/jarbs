@@ -16,10 +16,12 @@ module Jarbs
     def create(src_path, compile: true)
       data = prepare_for_aws(src_path, compile)
 
+      role = ask("IAM role for function: ")
+
       @client.create_function function_name: @name,
         runtime: 'nodejs',
         handler: 'handler.handler',
-        role: "arn:aws:iam::689543204258:role/dev-dumbo-r-IamRoleLambda-1MEDLE5CDO0KN",
+        role: role,
         memory_size: 128,
         timeout: 10,
         code: { zip_file: data }
