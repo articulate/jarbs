@@ -21,7 +21,8 @@ module Jarbs
         c.summary = 'Create new lambda function'
         c.option "--dir STRING", String, "Path of code dir to package"
         c.action do |args, options|
-          name = args[0] || File.basename(options.dir)
+          src_dir = options.dir || abort("--dir is required")
+          name = args.shift || File.basename(options.dir)
 
           lambda = Lambda.new(name)
           lambda.create(options.dir)
