@@ -2,14 +2,15 @@ require 'rubygems'
 require 'fileutils'
 require 'commander'
 
-require_relative 'jarbs/lambda'
+require 'jarbs/version'
+require 'jarbs/lambda'
 
 module Jarbs
   class CLI
     include Commander::Methods
 
     def run
-      program :version, '0.0.1'
+      program :version, Jarbs::VERSION
       program :description, 'Lambda Tooling'
 
       global_option('-d', '--debug', 'Enable debug mode') { $debug = true }
