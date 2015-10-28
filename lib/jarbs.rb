@@ -34,6 +34,7 @@ module Jarbs
         c.option "--dir STRING", String, "Path of code dir to package"
         c.option "--no-compile", "Don't run compile step"
         c.action do |args, options|
+          src_dir = options.dir || abort("--dir is required")
           name = args[0] || File.basename(options.dir)
 
           lambda = Lambda.new(name)
@@ -42,11 +43,19 @@ module Jarbs
       end
 
       command :rm do |c|
-        c.syntax = 'jarbs rm NAME'
+        c.syntax = 'jarbs rm NAME [NAME...]'
         c.summary = "Delete a lambda function"
         c.action do |args, options|
-          lambda = Lambda.new(args[0])
-          lambda.delete
+          begin
+            args.each do |fn|
+              begin
+                Lambda.new(fn).delete
+              rescue Aws::Lambda::Errors::ResourceNotFoundException => e
+                say_error "Function \"#{fn}\" does not exists. Ignoring."
+                next
+              end
+            end
+          end
         end
       end
 
