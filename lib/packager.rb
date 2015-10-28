@@ -2,38 +2,40 @@ require 'zip'
 
 module Jarbs
   class Packager
-    def initialize(name, src_dir)
+    include Commander::UI
+
+    def initialize(name, source_files)
       @name = name
-      @src_dir = src_dir
+      @source_files = source_files
     end
 
     def package
-      zipname = "#{@name}.zip"
-
-      say "Packaging the following files:"
+      say_ok "Packaging..."
 
       stream = Zip::OutputStream.write_buffer do |out|
-        contents.each do |filename|
-          basefn = File.basename(filename)
-          say basefn
-
-          out.put_next_entry(basefn)
-          out.write File.read(filename)
+        @source_files.each do |filename, source|
+          out.put_next_entry(filename)
+          out.write source
         end
       end
 
+      # TODO: save zip to FS if --debug
+      write_zip(stream.string) if $debug
+
       # return the generated zip data
       stream.string
+    end
+
+    def write_zip(data)
+      zipname = "#{@name}.zip"
+
+      File.open(zipname, 'w') {|zip| zip.write(data) }
+      say_warning "DEBUG: Output debug package to #{zipname}"
     end
 
     def delete
       File.delete "#{@name}.zip"
     end
 
-    def contents
-      path = File.join @src_dir, "**", "*.js"
-
-      Dir.glob(path)
-    end
   end
 end

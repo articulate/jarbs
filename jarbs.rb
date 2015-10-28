@@ -14,6 +14,8 @@ module Jarbs
       program :version, '0.0.1'
       program :description, 'Lambda Tooling'
 
+      global_option('-d', '--debug', 'Enable debug mode') { $debug = true }
+
       command :new do |c|
         c.syntax = 'jarbs new [options] [name: defaults to dir specified by --dir flag]'
         c.summary = 'Create new lambda function'

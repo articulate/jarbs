@@ -2,34 +2,56 @@ require 'babel/transpiler'
 
 module Jarbs
   class Compiler
-    def initialize(source, output=nil)
+    include Commander::UI
+
+    def initialize(source)
       @source = source
-      @output = output || File.join(source, "build")
     end
 
     def run
-      Dir.mkdir @output unless Dir.exists? @output
+      files = {}
+
+      say_ok "Compiling..."
 
       contents.each do |file|
-        compiled = Babel::Transpiler.transform File.read(file)
-        output_file = File.join @output, File.basename(file)
+        root_path = basename(file)
 
-        File.open(output_file, 'w') {|out| out.write compiled['code'] }
+        compiled_info = Babel::Transpiler.transform File.read(file)
+        files[root_path] = compiled_info['code']
+
+        write_compiled(root_path, compiled_info['code']) if $debug
       end
 
-      @output
-    end
+      say_warning "DEBUG: Compiled source output to #{debug_path}" if $debug
 
-    def clean
-      FileUtils.rm_r @output
+      files
     end
 
     private
 
+    def debug_path
+      File.join(@source, 'debug')
+    end
+
+    def write_compiled(file, src)
+      debug_file_path = File.join(debug_path, file)
+      root_dir_path = File.dirname(debug_file_path)
+
+      FileUtils.mkdir_p root_dir_path unless Dir.exists? root_dir_path
+      File.open(debug_file_path, 'w') do |debug_out|
+        debug_out.write(src)
+      end
+    end
+
+    def basename(filename)
+      filename.gsub(@source + '/', '')
+    end
+
     def contents
       path = File.join @source, "**", "*.js"
 
-      Dir.glob(path)
+      # return without possible debug dir
+      Dir.glob(path).reject {|f| f.start_with? debug_path }
     end
   end
 end
