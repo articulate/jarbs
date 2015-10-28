@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    jarbs (0.1.4)
+    jarbs (0.1.5)
       aws-sdk (~> 2)
       babel-transpiler
       commander
