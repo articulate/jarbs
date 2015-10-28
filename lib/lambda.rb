@@ -14,9 +14,11 @@ module Jarbs
     end
 
     def create(src_path)
-      compiled_src = Compiler.new(src_path).run
+      compiler = Compiler.new(src_path)
+      compiled_src = compiler.run
 
       stream = Packager.new(@name, compiled_src).package
+      compiler.clean
 
       @client.create_function function_name: @name,
         runtime: 'nodejs',

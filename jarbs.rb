@@ -1,6 +1,7 @@
 #!/usr/bin/env ruby
 
 require 'rubygems'
+require 'fileutils'
 require 'commander'
 
 require_relative 'lib/lambda'

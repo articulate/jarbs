@@ -1,5 +1,4 @@
 require 'zip'
-require 'base64'
 
 module Jarbs
   class Packager
