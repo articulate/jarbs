@@ -1,5 +1,6 @@
 #!/usr/bin/env ruby
 
-require './jarbs'
+require "bundler/setup"
+require "jarbs"
 
 Jarbs::CLI.new.run if $0 == __FILE__

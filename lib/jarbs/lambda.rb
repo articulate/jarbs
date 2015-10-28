@@ -1,8 +1,8 @@
 require 'aws-sdk'
-require 'base64'
 
-require_relative 'compiler'
-require_relative 'packager'
+require 'jarbs/function_definition'
+require 'jarbs/compiler'
+require 'jarbs/packager'
 
 module Jarbs
   class Lambda
@@ -13,8 +13,8 @@ module Jarbs
       @client = Aws::Lambda::Client.new region: default_region
     end
 
-    def create(src_path)
-      data = prepare_for_aws(src_path)
+    def create(src_path, compile: true)
+      data = prepare_for_aws(src_path, compile)
 
       @client.create_function function_name: @name,
         runtime: 'nodejs',
@@ -25,21 +25,23 @@ module Jarbs
         code: { zip_file: data }
     end
 
-    def update(src_path)
-      data = prepare_for_aws(src_path)
+    def update(src_path, compile: true)
+      data = prepare_for_aws(src_path, compile)
 
       @client.update_function_code function_name: @name, zip_file: data
     end
 
     def delete
-      @client.delete_function function_name: @name
+      res = @client.delete_function function_name: @name
+      say_ok "Removed #{@name}." if res.successful?
     end
 
     private
 
-    def prepare_for_aws(src_path)
-      compiled_src = Compiler.new(src_path).run
-      Packager.new(@name, compiled_src).package
+    def prepare_for_aws(src_path, compile)
+      function = FunctionDefinition.new(@name, src_path)
+      Compiler.new(function).run if compile
+      Packager.new(@name, function).package
     end
 
     def default_region

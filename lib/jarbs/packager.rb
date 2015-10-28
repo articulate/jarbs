@@ -4,16 +4,16 @@ module Jarbs
   class Packager
     include Commander::UI
 
-    def initialize(name, source_files)
+    def initialize(name, function)
       @name = name
-      @source_files = source_files
+      @function = function
     end
 
     def package
       say_ok "Packaging..."
 
       stream = Zip::OutputStream.write_buffer do |out|
-        @source_files.each do |filename, source|
+        @function.each_file do |filename, source|
           out.put_next_entry(filename)
           out.write source
         end
@@ -36,6 +36,5 @@ module Jarbs
     def delete
       File.delete "#{@name}.zip"
     end
-
   end
 end
