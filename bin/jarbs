@@ -1,0 +1,5 @@
+#!/usr/bin/env ruby
+
+require './jarbs'
+
+Jarbs::CLI.new.run if $0 == __FILE__
