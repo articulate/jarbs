@@ -15,9 +15,28 @@ module Jarbs
 
       global_option('-d', '--debug', 'Enable debug mode') { $debug = true }
 
-      command :new do |c|
+      command :create do |c|
+        c.syntax = 'jarbs create [options] name'
+        c.summary = "Generate a new lambda function skeleton"
+        c.option "-f", "--force", "Force overwrite of existing function definition"
+        c.action do |args, options|
+          name = args.shift || abort("Must provide a lambda name")
+
+          if Dir.exists? name
+            if options.force
+              FileUtils.rm_r name
+            else
+              abort("Function exists. Use the -f flag to force overwrite.")
+            end
+          end
+
+          Lambda.new(name).generate
+        end
+      end
+
+      command :deploy do |c|
         c.syntax = 'jarbs new [options] [name: defaults to dir specified by --dir flag]'
-        c.summary = 'Create new lambda function'
+        c.summary = 'Deploy a new lambda function'
         c.option "--dir STRING", String, "Path of code dir to package"
         c.option "--no-compile", "Don't run compile step"
         c.action do |args, options|
@@ -31,7 +50,7 @@ module Jarbs
 
       command :update do |c|
         c.syntax = 'jarbs update [options] [name: defaults to dir specified by --dir flag]'
-        c.summary = 'Update a lambda function'
+        c.summary = 'Update an existing lambda function'
         c.option "--dir STRING", String, "Path of code dir to package"
         c.option "--no-compile", "Don't run compile step"
         c.action do |args, options|

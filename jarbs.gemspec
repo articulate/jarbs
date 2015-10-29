@@ -21,6 +21,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency "aws-sdk", "~> 2"
   spec.add_dependency "rubyzip"
   spec.add_dependency "babel-transpiler"
+  spec.add_dependency "rugged"
 
   spec.add_development_dependency "bundler", "~> 1.10"
   spec.add_development_dependency "rake", "~> 10.0"

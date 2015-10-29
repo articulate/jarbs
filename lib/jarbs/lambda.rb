@@ -1,4 +1,5 @@
 require 'aws-sdk'
+require 'rugged'
 
 require 'jarbs/function_definition'
 require 'jarbs/compiler'
@@ -8,9 +9,45 @@ module Jarbs
   class Lambda
     include Commander::UI
 
+    LAMBDA_NODE_VERSION = "0.10.36"
+
     def initialize(name)
       @name = name
       @client = Aws::Lambda::Client.new region: default_region
+    end
+
+    def generate
+      # create dir
+      Dir.mkdir @name
+
+      package_manifest = {
+        name: @name,
+        version: '0.0.0',
+        description: ask("Function description: "),
+        author: `whoami`.chomp,
+        repository: {
+          type: "git",
+          url: repo_url
+        },
+        license: "UNLICENSED",
+        engines: {
+          node: "0.10.36"
+        },
+        main: "index.js",
+        scripts: {},
+        dependencies: {
+          "babel-runtime" => "^5.8.25"
+        },
+        devDependencies: {
+          "aws-sdk" => "^2.2.12",
+          "babel" => "^5.8.29"
+        }
+      }
+
+      # generate manifest file
+      File.open(File.join(@name, 'package.json'), 'w') do |f|
+        f.write JSON.pretty_generate(package_manifest)
+      end
     end
 
     def create(src_path, compile: true)
@@ -39,6 +76,12 @@ module Jarbs
     end
 
     private
+
+    def repo_url
+      Rugged::Repository.discover(".").remotes.first.url
+    rescue Rugged::RepositoryError => e
+      nil
+    end
 
     def prepare_for_aws(src_path, compile)
       function = FunctionDefinition.new(@name, src_path)
