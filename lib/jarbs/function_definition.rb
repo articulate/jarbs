@@ -2,6 +2,11 @@ module Jarbs
   class FunctionDefinition
     attr_reader :name, :source_path
 
+    IGNORE = [
+      "debug/",
+      "package.json"
+    ]
+
     def initialize(name, source_path)
       @name = name
       @source_path = source_path
@@ -10,8 +15,10 @@ module Jarbs
     def files
       path = File.join source_path, "**", "*.js"
 
-      # return without possible debug dir
-      Dir.glob(path).reject {|f| f.start_with? debug_path }
+      # reject anything we're ignoring
+      Dir.glob(path).reject do |file|
+        IGNORE.any? {|ignore| file.include? ignore }
+      end
     end
 
     def sources
