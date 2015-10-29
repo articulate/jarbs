@@ -58,7 +58,7 @@ module Jarbs
 
       @client.create_function function_name: @name,
         runtime: 'nodejs',
-        handler: 'handler.handler',
+        handler: 'index.handler',
         role: role,
         memory_size: 128,
         timeout: 10,
