@@ -17,6 +17,11 @@ module Jarbs
           out.put_next_entry(filename)
           out.write source
         end
+
+        @function.includes.each do |file|
+          out.put_next_entry(file)
+          out.write File.read(File.join(@function.source_path, file))
+        end
       end
 
       # TODO: save zip to FS if --debug

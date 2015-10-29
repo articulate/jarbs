@@ -4,7 +4,8 @@ module Jarbs
 
     IGNORE = [
       "debug/",
-      "package.json"
+      "package.json",
+      "node_modules/"
     ]
 
     def initialize(name, source_path)
@@ -12,12 +13,16 @@ module Jarbs
       @source_path = source_path
     end
 
+    def manifest
+      @manifest ||= JSON.parse File.read(File.join(source_path, 'package.json'))
+    end
+
     def files
       path = File.join source_path, "**", "*.js"
 
-      # reject anything we're ignoring
+      # return without possible debug dir
       Dir.glob(path).reject do |file|
-        IGNORE.any? {|ignore| file.include? ignore }
+        IGNORE.any? {|ignore| file.start_with? File.join(@source_path, ignore) }
       end
     end
 
@@ -25,8 +30,14 @@ module Jarbs
       @sources ||= {}
       return @sources unless @sources.empty?
 
+      puts files
       files.each {|f| update(basename(f), File.read(f)) }
       @sources
+    end
+
+    def includes
+      path = File.join source_path, "node_modules", "**", "*"
+      Dir.glob(path).reject {|f| File.directory? f }.map {|f| basename(f) }
     end
 
     def update(source_name, src)
