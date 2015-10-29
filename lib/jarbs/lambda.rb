@@ -49,6 +49,9 @@ module Jarbs
       File.open(File.join(@name, 'package.json'), 'w') do |f|
         f.write JSON.pretty_generate(package_manifest)
       end
+
+      # install base handler file
+      FileUtils.cp File.join(File.dirname(__FILE__), 'fixtures', 'index.js'), @name
     end
 
     def create(src_path, compile: true)
