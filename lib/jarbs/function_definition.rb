@@ -30,14 +30,15 @@ module Jarbs
       @sources ||= {}
       return @sources unless @sources.empty?
 
-      puts files
       files.each {|f| update(basename(f), File.read(f)) }
       @sources
     end
 
     def includes
-      path = File.join source_path, "node_modules", "**", "*"
-      Dir.glob(path).reject {|f| File.directory? f }.map {|f| basename(f) }
+      path = File.join source_path, "**", "*"
+      resources = Dir.glob(path, File::FNM_DOTMATCH).reject {|f| File.directory? f } - files
+
+      resources.map {|f| basename(f) }
     end
 
     def update(source_name, src)

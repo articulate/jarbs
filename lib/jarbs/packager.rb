@@ -4,8 +4,7 @@ module Jarbs
   class Packager
     include Commander::UI
 
-    def initialize(name, function)
-      @name = name
+    def initialize(function)
       @function = function
     end
 
@@ -32,14 +31,14 @@ module Jarbs
     end
 
     def write_zip(data)
-      zipname = "#{@name}.zip"
+      zipname = "#{@function.name}.zip"
 
       File.open(zipname, 'w') {|zip| zip.write(data) }
       say_warning "DEBUG: Output debug package to #{zipname}"
     end
 
     def delete
-      File.delete "#{@name}.zip"
+      File.delete "#{@function.name}.zip"
     end
   end
 end
