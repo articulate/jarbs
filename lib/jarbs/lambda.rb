@@ -3,6 +3,7 @@ require 'rugged'
 
 require 'jarbs/function_definition'
 require 'jarbs/compiler'
+require 'jarbs/node_build'
 require 'jarbs/packager'
 
 module Jarbs
@@ -86,7 +87,8 @@ module Jarbs
     def prepare_for_aws(src_path, compile)
       function = FunctionDefinition.new(@name, src_path)
       Compiler.new(function).run if compile
-      Packager.new(@name, function).package
+      NodeBuild.new(function).npm_install
+      Packager.new(function).package
     end
 
     def default_region
