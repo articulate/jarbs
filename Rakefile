@@ -15,7 +15,7 @@ namespace :articulate do
     version = Jarbs::VERSION
 
     system "bundle install"
-    system "git commit -am 'bump version for #{version} release"
+    system "git commit -am 'bump version for #{version} release'"
     system "gem_push=no rake release"
     system "gem push ./pkg/jarbs-#{version}.gem --host https://artifactory.articulate.com/artifactory/api/gems/rubygems-local"
   end
