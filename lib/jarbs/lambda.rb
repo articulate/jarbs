@@ -10,8 +10,6 @@ module Jarbs
   class Lambda
     include Commander::UI
 
-    LAMBDA_NODE_VERSION = "0.10.36"
-
     def initialize(name)
       @name = name
       @client = Aws::Lambda::Client.new region: default_region
@@ -38,10 +36,6 @@ module Jarbs
         scripts: {},
         dependencies: {
           "babel-runtime" => "^5.8.25"
-        },
-        devDependencies: {
-          "aws-sdk" => "^2.2.12",
-          "babel" => "^5.8.29"
         }
       }
 
