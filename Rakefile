@@ -10,13 +10,17 @@ require 'jarbs/version'
 
 # task :default => :test
 
+def abortable_run(cmd)
+  abort("Failed with #{$?.exitstatus}") unless system(cmd)
+end
+
 namespace :articulate do
   task :release do
     version = Jarbs::VERSION
 
-    system "bundle install"
-    system "git commit -am 'bump version for #{version} release'"
-    system "gem_push=no rake release"
-    system "gem push ./pkg/jarbs-#{version}.gem --host https://artifactory.articulate.com/artifactory/api/gems/rubygems-local"
+    abortable_run "bundle install"
+    abortable_run "git commit -am 'bump version for #{version} release'"
+    abortable_run "gem_push=no rake release"
+    abortable_run "gem push ./pkg/jarbs-#{version}.gem --host https://artifactory.articulate.com/artifactory/api/gems/rubygems-local"
   end
 end
