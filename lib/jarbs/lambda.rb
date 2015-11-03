@@ -1,7 +1,7 @@
 require 'aws-sdk'
-require 'rugged'
 
 require 'jarbs/function_definition'
+require 'jarbs/skeleton_generator'
 require 'jarbs/node_build'
 require 'jarbs/packager'
 
@@ -17,43 +17,7 @@ module Jarbs
     end
 
     def generate
-      say_ok "Generating function skeleton at #{@function.source_path}"
-      Dir.mkdir_p @function.source_path
-
-      package_manifest = {
-        name: @function.name,
-        version: '0.0.0',
-        description: ask("Function description: "),
-        author: `whoami`.chomp,
-        repository: {
-          type: "git",
-          url: repo_url
-        },
-        license: "UNLICENSED",
-        engines: {
-          node: "0.10.36"
-        },
-        main: "index.js",
-        scripts: {
-            build: "babel --optional runtime --out-dir dest src",
-        },
-        dependencies: {
-            'babel-runtime' => '< 6'
-        },
-        devDependencies: {
-            'babel' => '< 6'
-        }
-      }
-
-      # generate manifest file
-      File.open(File.join(@function.root_path, 'package.json'), 'w') do |f|
-        f.write JSON.pretty_generate(package_manifest)
-      end
-
-      # install base handler file
-      FileUtils.cp File.join(File.dirname(__FILE__), 'fixtures', 'index.js'), @function.source_path
-
-      # Install core NPM dependencies
+      SkeletonGenerator.new(@function).create_project
       NodeBuild.new(@function).npm_install
     end
 
@@ -88,12 +52,6 @@ module Jarbs
     end
 
     private
-
-    def repo_url
-      Rugged::Repository.discover(".").remotes.first.url
-    rescue Rugged::RepositoryError => e
-      nil
-    end
 
     def prepare_for_aws
       node = NodeBuild.new(@function)
