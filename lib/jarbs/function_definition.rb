@@ -1,8 +1,9 @@
 module Jarbs
   class FunctionDefinition
-    attr_reader :name, :root_path
+    attr_reader :env, :name, :root_path
 
-    def initialize(name, root_path, env)
+    def initialize(name, root_path, env='dev')
+      @env = env
       @name = name
       @root_path = root_path || name
     end
@@ -13,6 +14,10 @@ module Jarbs
 
     def manifest_file
       File.join(root_path, 'package.json')
+    end
+
+    def env_name
+      "#{env}-#{name}"
     end
 
     def files

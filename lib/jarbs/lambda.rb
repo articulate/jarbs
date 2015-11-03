@@ -26,8 +26,8 @@ module Jarbs
 
       role = ask("IAM role for function: ")
 
-      say "Deploying #{@function.name} to Lambda..."
-      @client.create_function function_name: @function.name,
+      say "Deploying #{@function.env_name} to Lambda..."
+      @client.create_function function_name: @function.env_name,
         runtime: 'nodejs',
         handler: 'index.handler',
         role: role,
@@ -41,14 +41,14 @@ module Jarbs
     def update
       data = prepare_for_aws
 
-      say "Updating #{@function.name} on Lambda..."
-      @client.update_function_code function_name: @function.name, zip_file: data
+      say "Updating #{@function.env_name} on Lambda..."
+      @client.update_function_code function_name: @function.env_name, zip_file: data
       say_ok "Complete!"
     end
 
     def delete
-      res = @client.delete_function function_name: @function.name
-      say_ok "Removed #{@function.name}." if res.successful?
+      res = @client.delete_function function_name: @function.env_name
+      say_ok "Removed #{@function.env_name}." if res.successful?
     end
 
     private
