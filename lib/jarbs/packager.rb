@@ -12,18 +12,12 @@ module Jarbs
       say_ok "Packaging..."
 
       stream = Zip::OutputStream.write_buffer do |out|
-        @function.each_file do |filename, source|
+        @function.each_file do |filename, contents|
           out.put_next_entry(filename)
-          out.write source
-        end
-
-        @function.includes.each do |file|
-          out.put_next_entry(file)
-          out.write File.read(File.join(@function.source_path, file))
+          out.write contents
         end
       end
 
-      # TODO: save zip to FS if --debug
       write_zip(stream.string) if $debug
 
       # return the generated zip data
@@ -35,10 +29,6 @@ module Jarbs
 
       File.open(zipname, 'w') {|zip| zip.write(data) }
       say_warning "DEBUG: Output debug package to #{zipname}"
-    end
-
-    def delete
-      File.delete "#{@function.name}.zip"
     end
   end
 end

@@ -2,7 +2,6 @@ require 'aws-sdk'
 require 'rugged'
 
 require 'jarbs/function_definition'
-require 'jarbs/compiler'
 require 'jarbs/node_build'
 require 'jarbs/packager'
 
@@ -10,17 +9,19 @@ module Jarbs
   class Lambda
     include Commander::UI
 
-    def initialize(name)
-      @name = name
+    def initialize(name, options)
+      @function = FunctionDefinition.new(name)
+      @options = options
+
       @client = Aws::Lambda::Client.new region: default_region
     end
 
     def generate
-      # create dir
-      Dir.mkdir @name
+      say_ok "Generating function skeleton at #{@function.source_path}"
+      Dir.mkdir_p @function.source_path
 
       package_manifest = {
-        name: @name,
+        name: @function.name,
         version: '0.0.0',
         description: ask("Function description: "),
         author: `whoami`.chomp,
@@ -33,44 +34,57 @@ module Jarbs
           node: "0.10.36"
         },
         main: "index.js",
-        scripts: {},
+        scripts: {
+            build: "babel --optional runtime --out-dir dest src",
+        },
         dependencies: {
-          "babel-runtime" => "^5.8.25"
+            'babel-runtime' => '< 6'
+        },
+        devDependencies: {
+            'babel' => '< 6'
         }
       }
 
       # generate manifest file
-      File.open(File.join(@name, 'package.json'), 'w') do |f|
+      File.open(File.join(@function.root_path, 'package.json'), 'w') do |f|
         f.write JSON.pretty_generate(package_manifest)
       end
 
       # install base handler file
-      FileUtils.cp File.join(File.dirname(__FILE__), 'fixtures', 'index.js'), @name
+      FileUtils.cp File.join(File.dirname(__FILE__), 'fixtures', 'index.js'), @function.source_path
+
+      # Install core NPM dependencies
+      NodeBuild.new(@function).npm_install
     end
 
-    def create(src_path, compile: true)
-      data = prepare_for_aws(src_path, compile)
+    def create
+      data = prepare_for_aws
 
       role = ask("IAM role for function: ")
 
-      @client.create_function function_name: @name,
+      say "Deploying #{@function.name} to Lambda..."
+      @client.create_function function_name: @function.name,
         runtime: 'nodejs',
         handler: 'index.handler',
         role: role,
         memory_size: 128,
         timeout: 10,
         code: { zip_file: data }
+
+      say_ok "Complete!"
     end
 
-    def update(src_path, compile: true)
-      data = prepare_for_aws(src_path, compile)
+    def update
+      data = prepare_for_aws
 
-      @client.update_function_code function_name: @name, zip_file: data
+      say "Updating #{@function.name} on Lambda..."
+      @client.update_function_code function_name: @function.name, zip_file: data
+      say_ok "Complete!"
     end
 
     def delete
-      res = @client.delete_function function_name: @name
-      say_ok "Removed #{@name}." if res.successful?
+      res = @client.delete_function function_name: @function.name
+      say_ok "Removed #{@function.name}." if res.successful?
     end
 
     private
@@ -81,11 +95,14 @@ module Jarbs
       nil
     end
 
-    def prepare_for_aws(src_path, compile)
-      function = FunctionDefinition.new(@name, src_path)
-      Compiler.new(function).run if compile
-      NodeBuild.new(function).npm_install
-      Packager.new(function).package
+    def prepare_for_aws
+      node = NodeBuild.new(@function)
+
+      node.npm_build
+      package = Packager.new(@function).package
+    ensure
+      node.clean
+      package
     end
 
     def default_region
