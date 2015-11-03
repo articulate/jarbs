@@ -2,7 +2,7 @@ module Jarbs
   class FunctionDefinition
     attr_reader :name, :root_path
 
-    def initialize(name, root_path=nil)
+    def initialize(name, root_path, env)
       @name = name
       @root_path = root_path || name
     end

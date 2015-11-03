@@ -10,7 +10,7 @@ module Jarbs
     include Commander::UI
 
     def initialize(name, options)
-      @function = FunctionDefinition.new(name)
+      @function = FunctionDefinition.new(name, options.dir, options.env)
       @options = options
 
       @client = Aws::Lambda::Client.new region: default_region

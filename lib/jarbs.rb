@@ -38,28 +38,28 @@ module Jarbs
       end
 
       command :deploy do |c|
-        c.syntax = 'jarbs deploy [options] [name: defaults to dir specified by --dir flag]'
+        c.syntax = 'jarbs deploy [options] directory'
         c.summary = 'Deploy a new lambda function'
         c.option "--dir STRING", String, "Path of code dir to package"
         c.action do |args, options|
-          options.default env: 'dev'
+          name = args.shift || abort('Name argument required')
 
-          src_dir = options.dir || abort("--dir is required")
-          name = args.shift || File.basename(src_dir)
+          options.default env: 'dev',
+                          dir: name
 
           Lambda.new(name, options).create
         end
       end
 
       command :update do |c|
-        c.syntax = 'jarbs update [options] [name: defaults to dir specified by --dir flag]'
+        c.syntax = 'jarbs update [options] name'
         c.summary = 'Update an existing lambda function'
         c.option "--dir STRING", String, "Path of code dir to package"
         c.action do |args, options|
-          options.default env: 'dev'
+          name = args.shift || abort('Name argument required')
 
-          src_dir = options.dir || abort("--dir is required")
-          name = args[0] || File.basename(src_dir)
+          options.default env: 'dev',
+                          dir: name
 
           Lambda.new(name, options).update
         end
@@ -69,7 +69,10 @@ module Jarbs
         c.syntax = 'jarbs rm NAME [NAME...]'
         c.summary = "Delete a lambda function"
         c.action do |args, options|
-          options.default env: 'dev'
+          name = args.shift || abort('Name argument required')
+
+          options.default env: 'dev',
+                          dir: name
 
           begin
             args.each do |fn|
