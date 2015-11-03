@@ -23,8 +23,7 @@ module Jarbs
 
     def create
       data = prepare_for_aws
-
-      role = ask("IAM role for function: ")
+      role = @options.role || ask("IAM role for function: ")
 
       say "Deploying #{@function.env_name} to Lambda..."
       @client.create_function function_name: @function.env_name,

@@ -41,6 +41,7 @@ module Jarbs
         c.syntax = 'jarbs deploy [options] directory'
         c.summary = 'Deploy a new lambda function'
         c.option "--dir STRING", String, "Path of code dir to package"
+        c.option "--role STRING", String, "IAM role for Lambda execution"
         c.action do |args, options|
           name = args.shift || abort('Name argument required')
 
