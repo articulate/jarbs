@@ -13,6 +13,7 @@ module Jarbs
       program :version, Jarbs::VERSION
       program :description, 'Lambda Tooling'
 
+      global_option('-e', '--env ENV', String, 'Set deployment environment [Default to "dev"]')
       global_option('-d', '--debug', 'Enable debug mode') { $debug = true }
 
       command :new do |c|
@@ -20,6 +21,8 @@ module Jarbs
         c.summary = "Generate a new lambda function skeleton"
         c.option "-f", "--force", "Force overwrite of existing function definition"
         c.action do |args, options|
+          options.default env: 'dev'
+
           name = args.shift || abort("Must provide a lambda name")
 
           if Dir.exists? name
@@ -30,7 +33,7 @@ module Jarbs
             end
           end
 
-          Lambda.new(name).generate
+          Lambda.new(name, options).generate
         end
       end
 
@@ -38,13 +41,13 @@ module Jarbs
         c.syntax = 'jarbs deploy [options] [name: defaults to dir specified by --dir flag]'
         c.summary = 'Deploy a new lambda function'
         c.option "--dir STRING", String, "Path of code dir to package"
-        c.option "--no-compile", "Don't run compile step"
         c.action do |args, options|
-          src_dir = options.dir || abort("--dir is required")
-          name = args.shift || File.basename(options.dir)
+          options.default env: 'dev'
 
-          lambda = Lambda.new(name)
-          lambda.create(options.dir, compile: !options.no_compile)
+          src_dir = options.dir || abort("--dir is required")
+          name = args.shift || File.basename(src_dir)
+
+          Lambda.new(name, options).create
         end
       end
 
@@ -52,13 +55,13 @@ module Jarbs
         c.syntax = 'jarbs update [options] [name: defaults to dir specified by --dir flag]'
         c.summary = 'Update an existing lambda function'
         c.option "--dir STRING", String, "Path of code dir to package"
-        c.option "--no-compile", "Don't run compile step"
         c.action do |args, options|
-          src_dir = options.dir || abort("--dir is required")
-          name = args[0] || File.basename(options.dir)
+          options.default env: 'dev'
 
-          lambda = Lambda.new(name)
-          lambda.update(options.dir, compile: !options.no_compile)
+          src_dir = options.dir || abort("--dir is required")
+          name = args[0] || File.basename(src_dir)
+
+          Lambda.new(name, options).update
         end
       end
 
@@ -66,10 +69,12 @@ module Jarbs
         c.syntax = 'jarbs rm NAME [NAME...]'
         c.summary = "Delete a lambda function"
         c.action do |args, options|
+          options.default env: 'dev'
+
           begin
             args.each do |fn|
               begin
-                Lambda.new(fn).delete
+                Lambda.new(fn, options).delete
               rescue Aws::Lambda::Errors::ResourceNotFoundException => e
                 say_error "Function \"#{fn}\" does not exists. Ignoring."
                 next
