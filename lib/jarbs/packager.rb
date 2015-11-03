@@ -25,7 +25,7 @@ module Jarbs
     end
 
     def write_zip(data)
-      zipname = "#{@function.name}.zip"
+      zipname = File.join(@function.root_path, "#{@function.name}.zip")
 
       File.open(zipname, 'w') {|zip| zip.write(data) }
       say_warning "DEBUG: Output debug package to #{zipname}"

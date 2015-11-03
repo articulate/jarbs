@@ -1,7 +1,9 @@
 require 'aws-sdk'
 
 require 'jarbs/function_definition'
-require 'jarbs/skeleton_generator'
+require 'jarbs/manifest_helpers'
+require 'jarbs/project_generator'
+require 'jarbs/function_generator'
 require 'jarbs/node_build'
 require 'jarbs/packager'
 
@@ -10,20 +12,19 @@ module Jarbs
     include Commander::UI
 
     def initialize(name, options)
-      @function = FunctionDefinition.new(name, options.dir, options.env)
       @options = options
 
+      @function = FunctionDefinition.new(name, @options.env)
       @client = Aws::Lambda::Client.new region: default_region
     end
 
     def generate
-      SkeletonGenerator.new(@function).create_project
-      NodeBuild.new(@function).npm_install
+      FunctionGenerator.new(@function).generate
     end
 
     def create
       data = prepare_for_aws
-      role = @options.role || ask("IAM role for function: ")
+      role = @options[:role] || ask("IAM role for function: ")
 
       say "Deploying #{@function.env_name} to Lambda..."
       @client.create_function function_name: @function.env_name,

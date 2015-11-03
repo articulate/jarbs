@@ -9,11 +9,13 @@ module Jarbs
   class CLI
     include Commander::Methods
 
+    GLOBAL_DEFAULTS = { env: 'dev' }
+
     def run
       program :version, Jarbs::VERSION
       program :description, 'Lambda Tooling'
 
-      global_option('-e', '--env ENV', String, 'Set deployment environment [Default to "dev"]')
+      global_option('-e', '--env ENV', String, 'Set deployment environment [Default to dev]')
       global_option('-d', '--debug', 'Enable debug mode') { $debug = true }
 
       command :new do |c|
@@ -21,9 +23,8 @@ module Jarbs
         c.summary = "Generate a new lambda function skeleton"
         c.option "-f", "--force", "Force overwrite of existing function definition"
         c.action do |args, options|
-          options.default env: 'dev'
-
           name = args.shift || abort("Must provide a lambda name")
+          options.default GLOBAL_DEFAULTS
 
           if Dir.exists? name
             if options.force
@@ -33,6 +34,12 @@ module Jarbs
             end
           end
 
+          # create project dir if doesn't exist yet
+          if !Dir.exists?('lambdas')
+            ProjectGenerator.new(name).generate
+            Dir.chdir name
+          end
+
           Lambda.new(name, options).generate
         end
       end
@@ -40,13 +47,10 @@ module Jarbs
       command :deploy do |c|
         c.syntax = 'jarbs deploy [options] directory'
         c.summary = 'Deploy a new lambda function'
-        c.option "--dir STRING", String, "Path of code dir to package"
-        c.option "--role STRING", String, "IAM role for Lambda execution"
+        c.option "--role [STRING]", String, "IAM role for Lambda execution"
         c.action do |args, options|
           name = args.shift || abort('Name argument required')
-
-          options.default env: 'dev',
-                          dir: name
+          options.default GLOBAL_DEFAULTS
 
           Lambda.new(name, options).create
         end
@@ -55,12 +59,9 @@ module Jarbs
       command :update do |c|
         c.syntax = 'jarbs update [options] name'
         c.summary = 'Update an existing lambda function'
-        c.option "--dir STRING", String, "Path of code dir to package"
         c.action do |args, options|
           name = args.shift || abort('Name argument required')
-
-          options.default env: 'dev',
-                          dir: name
+          options.default GLOBAL_DEFAULTS
 
           Lambda.new(name, options).update
         end
@@ -71,9 +72,7 @@ module Jarbs
         c.summary = "Delete a lambda function"
         c.action do |args, options|
           name = args.shift || abort('Name argument required')
-
-          options.default env: 'dev',
-                          dir: name
+          options.default GLOBAL_DEFAULTS
 
           begin
             args.each do |fn|

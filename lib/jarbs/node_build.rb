@@ -6,25 +6,18 @@ module Jarbs
       @function = function
     end
 
-    def npm_install
-      say_ok "Installing npm dependencies..."
-      run_in @function.root_path, 'npm install'
+    def npm_install(path, flags="")
+      run_in path, "npm install #{flags}"
     end
 
     def npm_build
-      say_ok "Building function..."
-      npm_install
+      say_ok 'Building function...'
 
       # Copy source dir to build location and build in-place
       FileUtils.cp_r @function.source_path, @function.build_path
-      run_in @function.root_path, 'npm run build'
+      abortable_run "npm run build:function -- --out-dir #{@function.build_path} #{@function.source_path}"
 
-      # Copy dependencies and manifest file
-      FileUtils.cp_r File.join(@function.root_path, 'node_modules'), @function.build_path
-      FileUtils.cp @function.manifest_file, @function.build_path
-
-      # Clean deps for production-only
-      run_in @function.build_path, 'npm prune --production'
+      npm_install @function.build_path, '--production'
     end
 
     def clean
