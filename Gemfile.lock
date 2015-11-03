@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    jarbs (0.3.1)
+    jarbs (0.4.0)
       aws-sdk (~> 2)
       commander
       rubyzip
