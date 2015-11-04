@@ -10,8 +10,6 @@ Currently we distributed the `jarbs` runtime via gems hosted by RubyGems.org.
 
 `gem install jarbs`
 
-If this is a new machine or you haven't had to install any C extentions for Ruby yet, you may also need `cmake` before this gem will install: `brew install cmake`. We're looking at options for eliminating this step.
-
 ## Usage
 
 For the most up-to-date documentation and usage, run `jarbs -h`
