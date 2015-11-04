@@ -78,5 +78,4 @@ Will destroy the lambda function on AWS (will still leave files in your lambdas 
 
 ## License
 
-*MIT*
-
+This software is provided under the the [MIT license](LICENSE).
