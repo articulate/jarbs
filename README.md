@@ -22,6 +22,7 @@ This produces:
 
 ```
 - my-function/
+  .gitignore (with minimal node defaults)
   package.json (for build and dev deps)
   - lambdas/
     - my-function/
