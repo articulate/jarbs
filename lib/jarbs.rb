@@ -46,24 +46,13 @@ module Jarbs
 
       command :deploy do |c|
         c.syntax = 'jarbs deploy [options] directory'
-        c.summary = 'Deploy a new lambda function'
+        c.summary = 'Deploy a lambda function to AWS'
         c.option "--role [STRING]", String, "IAM role for Lambda execution"
         c.action do |args, options|
           name = args.shift || abort('Name argument required')
           options.default GLOBAL_DEFAULTS
 
-          Lambda.new(name, options).create
-        end
-      end
-
-      command :update do |c|
-        c.syntax = 'jarbs update [options] name'
-        c.summary = 'Update an existing lambda function'
-        c.action do |args, options|
-          name = args.shift || abort('Name argument required')
-          options.default GLOBAL_DEFAULTS
-
-          Lambda.new(name, options).update
+          Lambda.new(name, options).deploy
         end
       end
 

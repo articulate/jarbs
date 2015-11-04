@@ -22,11 +22,15 @@ module Jarbs
       FunctionGenerator.new(@function).generate
     end
 
+    def deploy
+      exists? ? update : create
+    end
+
     def create
       data = prepare_for_aws
       role = @options[:role] || ask("IAM role for function: ")
 
-      say "Deploying #{@function.env_name} to Lambda..."
+      say "Creating #{@function.env_name} on Lambda..."
       @client.create_function function_name: @function.env_name,
         runtime: 'nodejs',
         handler: 'index.handler',
@@ -49,6 +53,16 @@ module Jarbs
     def delete
       res = @client.delete_function function_name: @function.env_name
       say_ok "Removed #{@function.env_name}." if res.successful?
+    end
+
+    def info
+      @client.get_function(function_name: @function.env_name)
+    end
+
+    def exists?
+      true if info
+    rescue Aws::Lambda::Errors::ResourceNotFoundException => e
+      false
     end
 
     private
