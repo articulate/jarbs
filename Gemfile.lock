@@ -5,7 +5,6 @@ PATH
       aws-sdk (~> 2)
       commander
       rubyzip
-      rugged
 
 GEM
   remote: https://rubygems.org/
@@ -28,7 +27,6 @@ GEM
       slop (~> 3.4)
     rake (10.4.2)
     rubyzip (1.1.7)
-    rugged (0.23.3)
     slop (3.6.0)
 
 PLATFORMS

@@ -1,5 +1,3 @@
-require 'rugged'
-
 module Jarbs
   module ManifestHelpers
 
@@ -14,9 +12,7 @@ module Jarbs
     end
 
     def repo_url
-      Rugged::Repository.discover(".").remotes.first.url
-    rescue Rugged::RepositoryError => e
-      nil
+      @repo_url ||= `git config --get remote.origin.url`.chomp
     end
   end
 end
