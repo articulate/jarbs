@@ -18,7 +18,7 @@ For the most up-to-date documentation and usage, run `jarbs -h`
 
 ### Generate a new lambda project:
 
-`lambda new my-function`
+`jarbs new my-function`
 
 This produces:
 
@@ -36,7 +36,7 @@ This produces:
 
 (while in the project folder created above):
 
-`lambda new other-function`
+`jarbs new other-function`
 
 Your project will then look like:
 
