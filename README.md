@@ -76,7 +76,7 @@ All functions are prefixed with the `--env` provided (i.e. 'dev', 'prod'). The e
 
 Will destroy the lambda function on AWS (will still leave files in your lambdas directory). You can specify multiple functions here if you wish.
 
-## License
+License
 
-*MIT*
+This software is provided under the the [MIT license](LICENSE).
 
