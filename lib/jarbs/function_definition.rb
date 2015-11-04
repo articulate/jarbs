@@ -1,0 +1,45 @@
+module Jarbs
+  class FunctionDefinition
+    attr_reader :env, :name, :root_path
+
+    def initialize(name, env='dev')
+      @env = env
+      @name = name
+      @root_path = File.join('lambdas', name)
+    end
+
+    def manifest
+      @manifest ||= JSON.parse File.read(manifest_file)
+    end
+
+    def manifest_file
+      File.join(source_path, 'package.json')
+    end
+
+    def env_name
+      "#{env}-#{name}"
+    end
+
+    def files
+      path = File.join build_path, "**", "*"
+      Dir.glob(path, File::FNM_DOTMATCH)
+          .reject {|f| File.directory? f }
+    end
+
+    def each_file(&block)
+      files.each {|file| yield basename(file), File.read(file) }
+    end
+
+    def build_path
+      File.join(root_path, 'dest')
+    end
+
+    def source_path
+      File.join(root_path, 'src')
+    end
+
+    def basename(filename)
+      filename.gsub(build_path + '/', '')
+    end
+  end
+end
