@@ -1,14 +1,11 @@
 module Jarbs
   class ProjectGenerator
     include ManifestHelpers
-
     def initialize(name)
       @name = name
     end
 
     def generate
-      FileUtils.mkdir @name
-
       manifest = {
           name: @name,
           version: '0.0.0',
@@ -31,7 +28,9 @@ module Jarbs
           }
       }
 
+      FileUtils.mkdir @name
       write_package(manifest, @name)
+
       NodeBuild.new(nil).npm_install(@name)
     end
   end

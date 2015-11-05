@@ -8,6 +8,14 @@ module Jarbs
       @root_path = File.join('lambdas', name)
     end
 
+    def exists?
+      Dir.exists? root_path
+    end
+
+    def remove!
+      FileUtils.rm_r root_path
+    end
+
     def manifest
       @manifest ||= JSON.parse File.read(manifest_file)
     end

@@ -11,6 +11,8 @@ module Jarbs
   class Lambda
     include Commander::UI
 
+    attr_accessor :function
+
     def initialize(name, options)
       @options = options
 
