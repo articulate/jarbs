@@ -32,6 +32,11 @@ module Jarbs
       write_package(manifest, @name)
 
       NodeBuild.new(nil).npm_install(@name)
+      install_handler
+    end
+
+    def install_handler
+      FileUtils.cp File.join(File.dirname(__FILE__), 'fixtures', '.gitignore'), @name
     end
   end
 end

@@ -12,7 +12,7 @@ module Jarbs
 
       FileUtils.mkdir_p @function.source_path
       install_manifest
-      install_handler
+      install_gitignore
     end
 
     private
@@ -40,7 +40,7 @@ module Jarbs
       write_package(package_manifest, @function.source_path)
     end
 
-    def install_handler
+    def install_gitignore
       FileUtils.cp File.join(File.dirname(__FILE__), 'fixtures', 'index.js'), @function.source_path
     end
   end
