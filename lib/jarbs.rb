@@ -2,7 +2,12 @@ require 'rubygems'
 require 'fileutils'
 require 'commander'
 
+require 'crash_reporter'
+require 'crash_reporter/reporters/github_issues'
+
 require 'jarbs/version'
+require 'jarbs/config'
+require 'jarbs/github_auth'
 require 'jarbs/lambda'
 
 module Jarbs
@@ -10,6 +15,17 @@ module Jarbs
     include Commander::Methods
 
     GLOBAL_DEFAULTS = { env: 'dev' }
+
+    def initialize
+      @config = Config.new
+
+      if @config.get('crashes.report')
+        CrashReporter.configure do |c|
+          c.engines = [CrashReporter::GithubIssues.new('articulate/jarbs', @config.get('github.token'))]
+          c.version = Jarbs::VERSION
+        end
+      end
+    end
 
     def run
       program :version, Jarbs::VERSION
@@ -103,5 +119,10 @@ module Jarbs
       # run future commands in the new jarbs dir
       Dir.chdir name
 
+      # create a config inside of the new project dir
+      config = Config.new
+      autolog = config.get('crashes.report') { agree("Would you like to log jarbs crashes to GitHub automatically (y/n)? ") }
+
+      GithubAuth.new(config).generate_token if autolog
   end
 end

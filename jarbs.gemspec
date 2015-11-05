@@ -10,7 +10,7 @@ Gem::Specification.new do |spec|
   spec.email         = ["hungerandthirst@gmail.com"]
 
   spec.summary       = %q{Jarbs: CLI Tooling for Lambda}
-  spec.description   = %q{Jarbs: They took em.}
+  spec.description   = %q{Jarbs: They took 'em.}
   spec.homepage      = "https://docs.articulate.zone/tools/jarbs.html"
 
   spec.files         = `git ls-files -z`.split("\x0").reject { |f| f.match(%r{^(test|spec|features)/}) }
@@ -20,8 +20,11 @@ Gem::Specification.new do |spec|
   spec.add_dependency "commander"
   spec.add_dependency "aws-sdk", "~> 2"
   spec.add_dependency "rubyzip"
+  spec.add_dependency "crash-reporter"
+  spec.add_dependency "octokit"
 
   spec.add_development_dependency "bundler", "~> 1.10"
   spec.add_development_dependency "rake", "~> 10.0"
+  spec.add_development_dependency "minitest"
   spec.add_development_dependency "pry"
 end

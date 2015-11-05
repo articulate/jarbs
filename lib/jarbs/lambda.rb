@@ -10,6 +10,7 @@ require 'jarbs/packager'
 module Jarbs
   class Lambda
     include Commander::UI
+    include CrashReporter::DSL
 
     attr_accessor :function
 
@@ -33,13 +34,16 @@ module Jarbs
       role = @options[:role] || ask("IAM role for function: ")
 
       say "Creating #{@function.env_name} on Lambda..."
-      @client.create_function function_name: @function.env_name,
-        runtime: 'nodejs',
-        handler: 'index.handler',
-        role: role,
-        memory_size: 128,
-        timeout: 10,
-        code: { zip_file: data }
+
+      capture_errors do
+        @client.create_function function_name: @function.env_name,
+          runtime: 'nodejs',
+          handler: 'index.handler',
+          role: role,
+          memory_size: 128,
+          timeout: 10,
+          code: { zip_file: data }
+      end
 
       say_ok "Complete!"
     end
@@ -48,7 +52,11 @@ module Jarbs
       data = prepare_for_aws
 
       say "Updating #{@function.env_name} on Lambda..."
-      @client.update_function_code function_name: @function.env_name, zip_file: data
+
+      capture_errors do
+        @client.update_function_code function_name: @function.env_name, zip_file: data
+      end
+
       say_ok "Complete!"
     end
 

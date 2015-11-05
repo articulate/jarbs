@@ -1,13 +1,14 @@
 module Jarbs
   class NodeBuild
     include Commander::UI
+    include CrashReporter::DSL
 
     def initialize(function)
       @function = function
     end
 
     def npm_install(path, flags="")
-      run_in path, "npm install #{flags}"
+      capture_errors { run_in(path, "npm install #{flags}") }
     end
 
     def npm_build
@@ -15,9 +16,12 @@ module Jarbs
 
       # Copy source dir to build location and build in-place
       FileUtils.cp_r @function.source_path, @function.build_path
-      abortable_run "npm run build:function -- --out-dir #{@function.build_path} #{@function.source_path}"
 
-      npm_install @function.build_path, '--production'
+      capture_errors do
+        abortable_run "npm run build:function -- --out-dir #{@function.build_path} #{@function.source_path}"
+
+        npm_install @function.build_path, '--production'
+      end
     end
 
     def clean
