@@ -60,7 +60,11 @@ module Jarbs
           name = args.shift || abort('Name argument required')
           options.default GLOBAL_DEFAULTS
 
-          Lambda.new(name, options).deploy
+          lambda = Lambda.new(name, options)
+
+          abort("Lambda '#{name}' does not exist.") unless lambda.exists?
+
+          lambda.deploy
         end
       end
 

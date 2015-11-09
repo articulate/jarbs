@@ -26,7 +26,7 @@ module Jarbs
     end
 
     def deploy
-      exists? ? update : create
+      deployed? ? update : create
     end
 
     def create
@@ -69,10 +69,14 @@ module Jarbs
       @client.get_function(function_name: @function.env_name)
     end
 
-    def exists?
+    def deployed?
       true if info
     rescue Aws::Lambda::Errors::ResourceNotFoundException => e
       false
+    end
+
+    def exists?
+      Dir.exists? function.source_path
     end
 
     private
