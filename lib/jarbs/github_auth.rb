@@ -6,8 +6,8 @@ module Jarbs
 
     def initialize(config)
       @config = config
-      @client = Octokit::Client.new
-        login: @config.get('github.username') { ask('GitHub username: ') }
+      @client = Octokit::Client.new \
+        login: @config.get('github.username') { ask('GitHub username: ') },
         password: password('Password (not saved): ')
     end
 
