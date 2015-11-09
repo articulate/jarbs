@@ -1,6 +1,11 @@
+require 'forwardable'
+
 module Jarbs
   class FunctionDefinition
+    extend Forwardable
+
     attr_reader :env, :name, :root_path
+    def_delegators :manifest, :description
 
     def initialize(name, env='dev')
       @env = env
@@ -17,7 +22,7 @@ module Jarbs
     end
 
     def manifest
-      @manifest ||= JSON.parse File.read(manifest_file)
+      @manifest ||= OpenStruct.new JSON.parse(File.read(manifest_file))
     end
 
     def manifest_file

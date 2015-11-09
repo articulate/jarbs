@@ -84,6 +84,18 @@ module Jarbs
         end
       end
 
+      command :ls do |c|
+        c.syntax = 'jarbs ls'
+        c.summary = "List lambda functions in this project"
+        c.action do |args, options|
+          lambdas = Dir.glob("lambdas/*").map {|x| Lambda.new(File.basename(x), options) }
+
+          lambdas.each do |l|
+            say "#{l.function.name}: #{l.function.description}"
+          end
+        end
+      end
+
       run!
     end
 
@@ -124,5 +136,6 @@ module Jarbs
       autolog = config.get('crashes.report') { agree("Would you like to log jarbs crashes to GitHub automatically (y/n)? ") }
 
       GithubAuth.new(config).generate_token if autolog
+    end
   end
 end
