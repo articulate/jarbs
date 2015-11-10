@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    jarbs (0.5.1)
+    jarbs (0.5.2)
       aws-sdk (~> 2)
       commander
       crash-reporter
