@@ -3,8 +3,11 @@ module Jarbs
     include Commander::UI
     include CrashReporter::DSL
 
+    MIN_NPM_VERSION = 2
+
     def initialize(function)
       @function = function
+      check_npm_version
     end
 
     def npm_install(path, flags="")
@@ -37,6 +40,20 @@ module Jarbs
     def abortable_run(cmd)
       success = system(cmd)
       abort("cpm runtime exited with non-zero status code: #{$?.exitstatus}") unless success
+    end
+
+    def check_npm_version
+      unless npm_version_major >= MIN_NPM_VERSION
+        say_warning "NPM should be at #{MIN_NPM_VERSION}.x or greater (currently #{npm_version})"
+      end
+    end
+
+    def npm_version
+      @npm_version ||= `npm -v`.chomp
+    end
+
+    def npm_version_major
+      npm_version.split('.').first.to_i
     end
   end
 end
