@@ -29,9 +29,22 @@ module Jarbs
       }
 
       FileUtils.mkdir @name
-      write_package(manifest, @name)
 
-      NodeBuild.new(nil).npm_install(@name)
+      Dir.chdir(@name) do
+        write_package(manifest, '.')
+        NodeBuild.new(nil).npm_install('.')
+
+        setup_crash_logging
+      end
+    end
+
+    def setup_crash_logging
+      config = Config.new
+      autolog = config.get('crashes.report') do
+        agree("Would you like to log jarbs crashes to GitHub automatically (y/n)? ")
+      end
+
+      GithubAuth.new(config).generate_token if autolog
     end
   end
 end

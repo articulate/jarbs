@@ -47,7 +47,7 @@ module Jarbs
           project_exists?(name, remove: options.force)
           lambda_exists?(lambda, remove: options.force)
 
-          generate_project(name) unless jarbs_project?
+          ProjectGenerator.new(name).generate unless jarbs_project?
           lambda.generate
         end
       end
@@ -129,17 +129,5 @@ module Jarbs
       File.exists?('.jarbs')
     end
 
-    def generate_project(name)
-      ProjectGenerator.new(name).generate
-
-      # run future commands in the new jarbs dir
-      Dir.chdir name
-
-      # create a config inside of the new project dir
-      config = Config.new
-      autolog = config.get('crashes.report') { agree("Would you like to log jarbs crashes to GitHub automatically (y/n)? ") }
-
-      GithubAuth.new(config).generate_token if autolog
-    end
   end
 end
