@@ -18,7 +18,9 @@ module Jarbs
       @options = options
 
       @function = FunctionDefinition.new(name, @options.env)
-      @client = Aws::Lambda::Client.new region: default_region
+
+      credentials = Aws::SharedCredentials.new(profile_name: @options.profile)
+      @client = Aws::Lambda::Client.new region: default_region, credentials: credentials
     end
 
     def generate

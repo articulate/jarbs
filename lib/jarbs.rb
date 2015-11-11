@@ -31,8 +31,11 @@ module Jarbs
       program :version, Jarbs::VERSION
       program :description, 'Lambda Tooling'
 
-      global_option('-e', '--env ENV', String, 'Set deployment environment [Default to dev]')
+      global_option('-e', '--env [dev]', String, 'Set deployment environment')
       global_option('-d', '--debug', 'Enable debug mode') { $debug = true }
+      global_option('-p', '--profile [default]', String, 'AWS credential profile to use') do |profile|
+        @config.set('aws.profile', profile)
+      end
 
       command :new do |c|
         c.syntax = 'jarbs new [options] name'
@@ -40,7 +43,7 @@ module Jarbs
         c.option "-f", "--force", "Force overwrite of existing function definition"
         c.action do |args, options|
           name = args.shift || abort("Must provide a lambda name")
-          options.default GLOBAL_DEFAULTS
+          options.default global_defaults
 
           lambda = Lambda.new(name, options)
 
@@ -58,7 +61,7 @@ module Jarbs
         c.option "--role [STRING]", String, "IAM role for Lambda execution"
         c.action do |args, options|
           name = args.shift || abort('Name argument required')
-          options.default GLOBAL_DEFAULTS
+          options.default global_defaults
 
           lambda = Lambda.new(name, options)
 
@@ -73,7 +76,7 @@ module Jarbs
         c.summary = "Delete a lambda function"
         c.action do |args, options|
           abort('Name argument required') if args.empty?
-          options.default GLOBAL_DEFAULTS
+          options.default global_defaults
 
           begin
             args.each do |fn|
@@ -104,6 +107,14 @@ module Jarbs
     end
 
     private
+
+    def profile
+      @config.get('aws.profile') { 'default' }
+    end
+
+    def global_defaults
+      GLOBAL_DEFAULTS.merge profile: profile
+    end
 
     def project_exists?(name, remove: false)
       if Dir.exists? name
