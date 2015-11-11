@@ -30,12 +30,12 @@ module Jarbs
 
       FileUtils.mkdir @name
 
-      Dir.chdir(@name) do
-        write_package(manifest, '.')
-        NodeBuild.new(nil).npm_install('.')
+      Dir.chdir(@name)
 
-        setup_crash_logging
-      end
+      write_package(manifest, '.')
+      NodeBuild.new(nil).npm_install('.')
+
+      setup_crash_logging
     end
 
     def setup_crash_logging
