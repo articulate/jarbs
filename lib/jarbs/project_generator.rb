@@ -44,7 +44,7 @@ module Jarbs
         agree("Would you like to log jarbs crashes to GitHub automatically (y/n)? ")
       end
 
-      GithubAuth.new(config).generate_token if autolog
+      GithubAuth.new(config).generate_token(@name) if autolog
     end
   end
 end

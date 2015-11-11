@@ -11,9 +11,9 @@ module Jarbs
         password: password('Password (not saved): ')
     end
 
-    def generate_token
+    def generate_token(name)
       resp = @client.create_authorization scopes: ['public_repo'],
-                                          note: 'Jarbs error reporting',
+                                          note: "Jarbs error reporting for #{name}",
                                           headers: { 'X-GitHub-OTP' => ask('GitHub two-factor token: ') }
 
       @config.set('github.token', resp.token)
