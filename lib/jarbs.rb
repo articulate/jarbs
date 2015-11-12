@@ -37,6 +37,18 @@ module Jarbs
         @config.set('aws.profile', profile)
       end
 
+      command :init do |c|
+        skip_setup = File.exists? '.jarbs'
+        abort('Lambda project already initialized.') if skip_setup
+
+        unless Dir.exists? 'lambdas'
+          say_warning("This doesn't look like a jarbs-enabled project directory (missing lambdas subdir).")
+          skip_setup = !agree('Continue (y/n)? ')
+        end
+
+        Config.touch unless skip_setup
+      end
+
       command :new do |c|
         c.syntax = 'jarbs new [options] name'
         c.summary = "Generate a new lambda function or project skeleton"

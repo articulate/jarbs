@@ -2,6 +2,10 @@ module Jarbs
   class Config
     FILE_NAME = '.jarbs'
 
+    def self.touch
+      File.open(FILE_NAME, 'w') {|f| f.write JSON.pretty_generate({}) }
+    end
+
     def initialize(file=FILE_NAME)
       @file = file
       @config = read
