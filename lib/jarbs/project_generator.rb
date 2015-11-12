@@ -33,9 +33,17 @@ module Jarbs
       Dir.chdir(@name)
 
       write_package(manifest, '.')
+      install_gitignore
+
       NodeBuild.new(nil).npm_install('.')
 
       setup_crash_logging
+    end
+
+    private
+
+    def install_gitignore
+      install_fixture('.gitignore', '.')
     end
 
     def setup_crash_logging
