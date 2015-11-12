@@ -38,15 +38,25 @@ module Jarbs
       end
 
       command :init do |c|
-        skip_setup = File.exists? '.jarbs'
-        abort('Lambda project already initialized.') if skip_setup
+        c.syntax = 'jarbs init'
+        c.summary = 'Setup lambda project in an existing directory'
+        c.description = <<-DESC
+Git ignores jarbs project definition file so on checkout of an existing lambda function.
+When checking out a project from source control or transitioning a legacy lambda codebase to use
+with jarbs, you'll need to run this command to setup the initial config and run additional checks
+for compatability.
+        DESC
+        c.action do |args, options|
+          skip_setup = File.exists? '.jarbs'
+          abort('Lambda project already initialized.') if skip_setup
 
-        unless Dir.exists? 'lambdas'
-          say_warning("This doesn't look like a jarbs-enabled project directory (missing lambdas subdir).")
-          skip_setup = !agree('Continue (y/n)? ')
+          unless Dir.exists? 'lambdas'
+            say_warning("This doesn't look like a jarbs-enabled project directory (missing lambdas subdir).")
+            skip_setup = !agree('Continue (y/n)? ')
+          end
+
+          Config.touch unless skip_setup
         end
-
-        Config.touch unless skip_setup
       end
 
       command :new do |c|
