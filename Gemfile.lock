@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    jarbs (0.5.4)
+    jarbs (0.5.5)
       aws-sdk (~> 2)
       commander
       crash-reporter
@@ -12,12 +12,12 @@ GEM
   remote: https://rubygems.org/
   specs:
     addressable (2.3.8)
-    aws-sdk (2.1.35)
-      aws-sdk-resources (= 2.1.35)
-    aws-sdk-core (2.1.35)
+    aws-sdk (2.1.36)
+      aws-sdk-resources (= 2.1.36)
+    aws-sdk-core (2.1.36)
       jmespath (~> 1.0)
-    aws-sdk-resources (2.1.35)
-      aws-sdk-core (= 2.1.35)
+    aws-sdk-resources (2.1.36)
+      aws-sdk-core (= 2.1.36)
     coderay (1.1.0)
     commander (4.3.5)
       highline (~> 1.7.2)
