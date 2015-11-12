@@ -41,7 +41,7 @@ module Jarbs
     end
 
     def install_handler
-      FileUtils.cp File.join(File.dirname(__FILE__), 'fixtures', 'index.js'), @function.source_path
+      install_fixture('index.js', @function.source_path)
     end
   end
 end
