@@ -27,12 +27,20 @@ module Jarbs
       FunctionGenerator.new(@function).generate
     end
 
+    def prepare
+      node = NodeBuild.new(@function)
+
+      node.npm_build
+      @package = Packager.new(@function).package
+    ensure
+      node.clean
+    end
+
     def deploy
       deployed? ? update : create
     end
 
     def create
-      data = prepare_for_aws
       role = @options[:role] || ask("IAM role for function: ")
 
       say "Creating #{@function.env_name} on Lambda..."
@@ -44,19 +52,17 @@ module Jarbs
           role: role,
           memory_size: 128,
           timeout: 10,
-          code: { zip_file: data }
+          code: { zip_file: @package }
       end
 
       say_ok "Complete!"
     end
 
     def update
-      data = prepare_for_aws
-
       say "Updating #{@function.env_name} on Lambda..."
 
       capture_errors do
-        @client.update_function_code function_name: @function.env_name, zip_file: data
+        @client.update_function_code function_name: @function.env_name, zip_file: @package
       end
 
       say_ok "Complete!"
@@ -82,16 +88,6 @@ module Jarbs
     end
 
     private
-
-    def prepare_for_aws
-      node = NodeBuild.new(@function)
-
-      node.npm_build
-      package = Packager.new(@function).package
-    ensure
-      node.clean
-      package
-    end
 
     def default_region
       `aws configure get region`.chomp

@@ -80,16 +80,22 @@ for compatability.
       command :deploy do |c|
         c.syntax = 'jarbs deploy [options] directory'
         c.summary = 'Deploy a lambda function to AWS'
-        c.option "--role [STRING]", String, "IAM role for Lambda execution"
+        c.option '--role [STRING]', String, 'IAM role for Lambda execution'
+        c.option '--dry', 'Dry run (do not interact with AWS)'
         c.action do |args, options|
           name = args.shift || abort('Name argument required')
           options.default global_defaults
 
           lambda = Lambda.new(name, options)
-
           abort("Lambda '#{name}' does not exist.") unless lambda.exists?
 
-          lambda.deploy
+          lambda.prepare
+
+          if options.dry
+            say_warning('Dry run: Did not deploy to lambda.')
+          else
+            lambda.deploy
+          end
         end
       end
 
@@ -161,6 +167,5 @@ for compatability.
     def jarbs_project?
       File.exists?('.jarbs')
     end
-
   end
 end
