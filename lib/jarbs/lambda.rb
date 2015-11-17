@@ -83,15 +83,17 @@ module Jarbs
 
       say "Invoking with:\n\n#{payload}\n\n"
 
-      resp = @client.invoke function_name: @function.env_name,
-                            log_type: 'Tail',
-                            payload: payload
+      capture_errors do
+        resp = @client.invoke function_name: @function.env_name,
+                              log_type: 'Tail',
+                              payload: payload
 
 
-      if resp.successful?
-        say_ok Base64.decode64(resp.data.log_result)
-      else
-        say_error resp.error.message
+        if resp.successful?
+          say_ok Base64.decode64(resp.data.log_result)
+        else
+          say_error resp.error.message
+        end
       end
     end
 
