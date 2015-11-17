@@ -131,6 +131,25 @@ for compatability.
         end
       end
 
+      command :invoke do |c|
+        c.syntax = 'jarbs run NAME [payload]'
+        c.summary = 'Invoke the lambda function and prints the cloudwatch logs.'
+        c.option '--file FILE', 'JSON file to use as the payload (ignored if payload is specified in the command).'
+        c.action do |args, options|
+          name = args.shift || abort('Name argument required')
+          payload = args.shift || ""
+
+          if payload.nil? && File.exists?(options.file)
+            payload = File.read(options.file)
+          end
+
+          options.default global_defaults
+
+          lambda = Lambda.new(name, options)
+          lambda.invoke(payload)
+        end
+      end
+
       run!
     end
 

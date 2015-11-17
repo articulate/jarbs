@@ -1,4 +1,5 @@
 require 'aws-sdk'
+require 'base64'
 
 require 'jarbs/function_definition'
 require 'jarbs/manifest_helpers'
@@ -75,6 +76,23 @@ module Jarbs
 
     def info
       @client.get_function(function_name: @function.env_name)
+    end
+
+    def invoke(payload="")
+      payload = JSON.generate(payload) unless payload.is_a? String
+
+      say "Invoking with:\n\n#{payload}\n\n"
+
+      resp = @client.invoke function_name: @function.env_name,
+                            log_type: 'Tail',
+                            payload: payload
+
+
+      if resp.successful?
+        say_ok Base64.decode64(resp.data.log_result)
+      else
+        say_error resp.error.message
+      end
     end
 
     def deployed?
