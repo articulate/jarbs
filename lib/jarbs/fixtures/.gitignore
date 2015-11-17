@@ -17,6 +17,7 @@ npm-debug.log*
 # Misc
 *.swp
 /dest/
+*.zip
 
 # Secrets and config
 .env
