@@ -156,7 +156,7 @@ for compatability.
     private
 
     def profile
-      @config.get('aws.profile') { 'default' }
+      @config.get('aws.profile') || 'default'
     end
 
     def global_defaults
@@ -178,7 +178,7 @@ for compatability.
         if remove
           lambda.function.remove!
         else
-          abort("Function #{lambda.name} exists. Use the -f flag to force overwrite.")
+          abort("Function #{lambda.function.name} exists. Use the -f flag to force overwrite.")
         end
       end
     end
