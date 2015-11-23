@@ -37,6 +37,26 @@ module Jarbs
         @config.set('aws.profile', profile)
       end
 
+      command :config do |c|
+        c.syntax = 'jarbs config [options]'
+        c.option '-g', '--global', String, "Use global config"
+        c.action do |args, options|
+          method = args.shift
+
+          if method == 'set'
+            args.each do |settings|
+              k, v = settings.split("=")
+
+              @config.set(k, v, from_global: options.global)
+            end
+          elsif method == 'get'
+            @config.get(args.first, from_global: options.global)
+          else
+            @config.print(for_global: options.global)
+          end
+        end
+      end
+
       command :init do |c|
         c.syntax = 'jarbs init'
         c.summary = 'Setup lambda project in an existing directory'

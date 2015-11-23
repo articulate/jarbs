@@ -43,6 +43,12 @@ module Jarbs
       val
     end
 
+    def print(for_global: false)
+      return global.print if for_global
+
+      pp @config
+    end
+
     private
 
     def finalize
