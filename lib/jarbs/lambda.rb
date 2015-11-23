@@ -48,12 +48,12 @@ module Jarbs
 
       capture_errors do
         @client.create_function function_name: @function.env_name,
-          runtime: 'nodejs',
-          handler: 'index.handler',
-          role: role,
-          memory_size: 128,
-          timeout: 10,
-          code: { zip_file: @package }
+                                runtime: 'nodejs',
+                                handler: 'index.handler',
+                                role: role,
+                                memory_size: 128,
+                                timeout: 10,
+                                code: { zip_file: @package }
       end
 
       say_ok "Complete!"
@@ -63,7 +63,8 @@ module Jarbs
       say "Updating #{@function.env_name} on Lambda..."
 
       capture_errors do
-        @client.update_function_code function_name: @function.env_name, zip_file: @package
+        @client.update_function_code function_name: @function.env_name,
+                                     zip_file: @package
       end
 
       say_ok "Complete!"
