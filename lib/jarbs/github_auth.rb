@@ -13,7 +13,7 @@ module Jarbs
 
     def generate_token(name)
       resp = @client.create_authorization scopes: ['public_repo'],
-                                          note: "Jarbs error reporting for #{name}",
+                                          note: "Jarbs error reporting",
                                           headers: { 'X-GitHub-OTP' => ask('GitHub two-factor token: ') }
 
       @config.set('github.token', resp.token)

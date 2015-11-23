@@ -26,6 +26,26 @@ describe Jarbs::Config do
 
     assert_equal 'here', file['newthing']
   end
+
+  describe "global" do
+    let(:global) { Jarbs::Config.new('test/fixtures/.global_jarbs') }
+
+    before do
+      config.stub(:global, global) do
+        config.set('tester', 'ing', from_global: true)
+      end
+    end
+
+    it "can get and set global options" do
+      config.stub(:global, global) do
+        assert_equal 'ing', config.get('tester', from_global: true)
+      end
+    end
+
+    it "doesn't set the local config" do
+      assert_nil config.get('tester')
+    end
+  end
 end
 
 

@@ -47,7 +47,7 @@ module Jarbs
     end
 
     def setup_crash_logging
-      config = Config.new
+      config = Config.global
       autolog = config.get('crashes.report') do
         agree("Would you like to log jarbs crashes to GitHub automatically (y/n)? ")
       end

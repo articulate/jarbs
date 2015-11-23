@@ -19,9 +19,9 @@ module Jarbs
     def initialize
       @config = Config.new
 
-      if @config.get('crashes.report')
+      if @config.get('crashes.report', from_global: true)
         CrashReporter.configure do |c|
-          c.engines = [CrashReporter::GithubIssues.new('articulate/jarbs', @config.get('github.token'))]
+          c.engines = [CrashReporter::GithubIssues.new('articulate/jarbs', @config.get('github.token', from_global: true))]
           c.version = Jarbs::VERSION
         end
       end
@@ -33,7 +33,7 @@ module Jarbs
 
       global_option('-e', '--env [dev]', String, 'Set deployment environment')
       global_option('-d', '--debug', 'Enable debug mode') { $debug = true }
-      global_option('-p', '--profile [default]', String, 'AWS credential profile to use') do |profile|
+      global_option('-p', '--profile PROFILE', String, 'AWS credential profile to use') do |profile|
         @config.set('aws.profile', profile)
       end
 

@@ -1,9 +1,17 @@
+require 'pp'
+
 module Jarbs
   class Config
     FILE_NAME = '.jarbs'
+    GLOBAL_CONFIG = File.join(Dir.home, FILE_NAME)
 
-    def self.touch
-      File.open(FILE_NAME, 'w') {|f| f.write JSON.pretty_generate({}) }
+    def self.touch(for_global: false)
+      path = for_global ? GLOBAL_CONFIG : FILE_NAME
+      File.open(path, 'w') {|f| f.write JSON.pretty_generate({}) }
+    end
+
+    def self.global
+      new GLOBAL_CONFIG
     end
 
     def initialize(file=FILE_NAME)
@@ -11,12 +19,20 @@ module Jarbs
       @config = read
     end
 
-    def set(key, value)
+    def global
+      @global ||= self.class.global
+    end
+
+    def set(key, value, from_global: false)
+      return global.set(key, value) if from_global
+
       @config[key] = value
       finalize
     end
 
-    def get(key, &block)
+    def get(key, from_global: false, &block)
+      return global.get(key, &block) if from_global
+
       val = @config[key]
 
       if !val && block_given?
