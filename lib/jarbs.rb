@@ -51,6 +51,8 @@ module Jarbs
             end
           elsif method == 'get'
             @config.get(args.first, from_global: options.global)
+          elsif method == 'delete'
+            @config.delete(args.first, from_global: options.global)
           else
             @config.print(for_global: options.global)
           end

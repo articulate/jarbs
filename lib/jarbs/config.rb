@@ -43,6 +43,13 @@ module Jarbs
       val
     end
 
+    def delete(key, from_global: false)
+      return global.delete(key) if from_global
+
+      @config.delete key
+      finalize
+    end
+
     def print(for_global: false)
       return global.print if for_global
 
