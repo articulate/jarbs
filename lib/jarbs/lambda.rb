@@ -6,6 +6,7 @@ require 'jarbs/project_generator'
 require 'jarbs/function_generator'
 require 'jarbs/node_build'
 require 'jarbs/packager'
+require 'jarbs/log_collector'
 
 module Jarbs
   class Lambda
@@ -53,6 +54,11 @@ module Jarbs
                                 code: { zip_file: @package }
       end
 
+      if @options.logger || agree('Enable ElasticSearch logging for lambda (y/n)? ')
+        location = @options.logger || ask("ES Lambda logging function name: ")
+        enable_logging(location)
+      end
+
       say_ok "Complete!"
     end
 
@@ -65,6 +71,14 @@ module Jarbs
       end
 
       say_ok "Complete!"
+    end
+
+    def enable_logging(destination)
+      logger.enable(destination)
+    end
+
+    def disable_logging(destination)
+      logger.disable(destination)
     end
 
     def delete
@@ -107,8 +121,8 @@ module Jarbs
 
     private
 
-    def default_region
-      `aws configure get region`.chomp
+    def logger
+      @logger ||= LogCollector.new(function, @options)
     end
   end
 end

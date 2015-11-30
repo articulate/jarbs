@@ -29,6 +29,10 @@ module Jarbs
       File.join(source_path, 'package.json')
     end
 
+    def log_group_name
+      "/aws/lambda/#{env_name}"
+    end
+
     def env_name
       "#{env}-#{name}"
     end

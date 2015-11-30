@@ -104,7 +104,8 @@ for compatability.
       command :deploy do |c|
         c.syntax = 'jarbs deploy [options] directory'
         c.summary = 'Deploy a lambda function to AWS'
-        c.option '--role [STRING]', String, 'IAM role for Lambda execution'
+        c.option '--role STRING', String, 'IAM role for Lambda execution'
+        c.option '--logger FUNCTION_NAME', String, 'Destination function for CloudWatch Logs to be delivered to.'
         c.option '--dry', 'Dry run (do not interact with AWS)'
         c.action do |args, options|
           name = args.shift || abort('Name argument required')
@@ -151,6 +152,32 @@ for compatability.
 
           lambdas.each do |l|
             say "#{l.function.name}: #{l.function.description}"
+          end
+        end
+      end
+
+      command :logging do |c|
+        c.syntax = 'jarbs logging NAME [enable|disable]'
+        c.summary = <<-DESC
+Enable CloudWatch to ElasticSearch logging. You will need to have a lambda available to push logs
+to ElasticSearch available. This can be deployed via a pre-defined lambda that AWS provides you with
+when you use the "Start Streaming to Amazon ElasticSearch Service" action in the CloudWatch Logs
+interface. Once this function exists, you will not need to recreate for future Lambdas. Jarbs will
+store this function name in the config for reuse.
+        DESC
+        c.option '--logger FUNCTION_NAME', String, 'Destination function for CloudWatch Logs to be delivered to.'
+        c.action do |args, options|
+          name = args.shift || abort("Name argument required")
+          trigger = args.shift || 'enable'
+          options.default global_defaults
+
+          lambda = Lambda.new(name, options)
+          logger = @config.get('aws.logging.function') { options.logger }
+
+          if trigger == 'enable'
+            lambda.enable_logging(logger)
+          else
+            lambda.disable_logging(logger)
           end
         end
       end
