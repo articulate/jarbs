@@ -1,4 +1,3 @@
-require 'aws-sdk'
 require 'base64'
 
 require 'jarbs/function_definition'
@@ -19,9 +18,7 @@ module Jarbs
       @options = options
 
       @function = FunctionDefinition.new(name, @options.env)
-
-      credentials = Aws::SharedCredentials.new(profile_name: @options.profile)
-      @client = Aws::Lambda::Client.new region: default_region, credentials: credentials
+      @client = AwsClientFactory.new(@options).lambda_client
     end
 
     def generate

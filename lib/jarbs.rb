@@ -1,6 +1,7 @@
 require 'rubygems'
 require 'fileutils'
 require 'commander'
+require 'aws-sdk'
 
 require 'crash_reporter'
 require 'crash_reporter/reporters/github_issues'
@@ -8,6 +9,7 @@ require 'crash_reporter/reporters/github_issues'
 require 'jarbs/version'
 require 'jarbs/config'
 require 'jarbs/github_auth'
+require 'jarbs/aws_client_factory'
 require 'jarbs/lambda'
 
 module Jarbs
