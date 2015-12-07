@@ -157,7 +157,7 @@ for compatability.
         c.option '--file FILE', 'JSON file to use as the payload (ignored if payload is specified in the command).'
         c.action do |args, options|
           name = args.shift || abort('Name argument required')
-          payload = args.shift || ""
+          payload = args.shift
 
           if payload.nil? && File.exists?(options.file)
             payload = File.read(options.file)
