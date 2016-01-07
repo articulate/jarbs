@@ -43,6 +43,12 @@ module Jarbs
       val
     end
 
+    def exists?(key, in_global: false)
+      return global.exists?(key) if in_global
+
+      !get(key).nil?
+    end
+
     def print(for_global: false)
       return global.print if for_global
 

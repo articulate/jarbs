@@ -16,6 +16,17 @@ describe Jarbs::Config do
     assert_equal 'whata', config.get('burger')
   end
 
+  describe 'exists' do
+    it 'returns true if config is set' do
+      config.set('test', 'thinger')
+      assert config.exists?('test'), 'Expected value "test" to exist in config'
+    end
+
+    it 'returns fale if config not set' do
+      refute config.exists?('nopenopenope'), 'Expected value "nopenopenope" not to exist in config'
+    end
+  end
+
   it 'initializes self from file' do
     assert_equal 'burger', config.get('need.a')
   end
