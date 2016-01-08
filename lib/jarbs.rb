@@ -38,6 +38,7 @@ module Jarbs
       end
 
       command :config do |c|
+        c.summary = 'Manage jarbs configuration'
         c.syntax = 'jarbs config [options]'
         c.option '-g', '--global', String, "Use global config"
         c.action do |args, options|
