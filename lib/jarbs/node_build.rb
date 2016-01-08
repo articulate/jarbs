@@ -21,7 +21,7 @@ module Jarbs
       FileUtils.cp_r @function.source_path, @function.build_path
 
       capture_errors do
-        abortable_run "npm run build:function -- --out-dir #{@function.build_path} #{@function.source_path}"
+        abortable_run "npm run build:function -- --out-dir #{@function.build_path} #{@function.build_path}"
 
         npm_install @function.build_path, '--production'
       end
